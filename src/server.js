@@ -8,7 +8,7 @@ app.use(express.static("public"));
 
 function parseCourseId(rawId) {
   const id = Number(rawId);
-  return Number.isSafeInteger(id) && id > 0 ? id : null;
+  return Number.isInteger(id) && id > 0 ? id : null;
 }
 
 function validateCourse(data) {

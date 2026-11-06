@@ -172,7 +172,7 @@ async function handleDelete(id, name) {
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const id = courseIdInput.value;
+  const id = courseIdInput.value.trim();
   const name = nameInput.value.trim();
   const credits = Number(creditsInput.value);
 
@@ -191,12 +191,14 @@ form.addEventListener("submit", async (event) => {
   showStatus(id ? "Updating course..." : "Creating course...", "loading");
 
   try {
-    if (id) {
+    if (id !== "") {
+
       const updatedCourse = await updateCourse(id, name, credits);
       resetForm();
       await loadCourses();
       showStatus(`Course "${updatedCourse.name}" updated successfully.`, "success");
     } else {
+
       const newCourse = await createCourse(name, credits);
       resetForm();
       await loadCourses();
