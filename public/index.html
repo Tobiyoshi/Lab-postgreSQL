@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Course Management</title>
-
     <style>
         * {
             box-sizing: border-box;
@@ -97,6 +95,43 @@
             background: #334155;
         }
 
+        .danger-button {
+            background: #dc2626;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .danger-button:hover {
+            background: #b91c1c;
+        }
+
+        .edit-button {
+            background: #eab308;
+            color: #000;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .edit-button:hover {
+            background: #ca8a04;
+        }
+
+        .rainbow-button {
+            background: linear-gradient(to right, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #6366f1, #a855f7);
+            color: white;
+            padding: 6px 12px;
+            font-size: 13px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .rainbow-button:hover {
+            opacity: 0.9;
+            filter: brightness(1.1);
+        }
+
         .toolbar {
             display: flex;
             align-items: center;
@@ -147,6 +182,12 @@
             background: #f8fafc;
         }
 
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .empty {
             padding: 24px;
             text-align: center;
@@ -169,7 +210,6 @@
             }
         }
     </style>
-
     <script src="/app.js" defer></script>
 </head>
 
@@ -178,39 +218,33 @@
 
         <h1>Course Management</h1>
         <p class="subtitle">
-            Web–Database Integration Demo
-            (Express + PostgreSQL)
+            Web–Database Integration Demo (Express + PostgreSQL)
         </p>
 
         <div id="status" class="status" role="status" aria-live="polite">
             Ready
         </div>
 
-        <!-- Add Course Form -->
+        <!-- Add / Edit Course Form -->
         <section class="card">
-            <h2>Add New Course</h2>
+            <h2 id="form-title">Add New Course</h2>
 
             <form id="course-form">
+                <input type="hidden" id="course-id" value="" />
                 <div class="form-row">
 
                     <div class="field">
-                        <label for="course-name">
-                            Course Name
-                        </label>
-                        <input id="course-name" type="text" maxlength="150" placeholder="e.g. Web Programming"
-                            required />
+                        <label for="course-name">Course Name</label>
+                        <input id="course-name" type="text" maxlength="150" placeholder="e.g. Web Programming" required />
                     </div>
 
                     <div class="field">
-                        <label for="course-credits">
-                            Credits
-                        </label>
+                        <label for="course-credits">Credits</label>
                         <input id="course-credits" type="number" min="1" max="6" step="1" value="3" required />
                     </div>
 
-                    <button id="add-button" type="submit">
-                        Add Course
-                    </button>
+                    <button id="add-button" type="submit">Add Course</button>
+                    <button id="cancel-button" class="secondary-button" type="button" hidden>Cancel</button>
 
                 </div>
             </form>
@@ -221,10 +255,7 @@
 
             <div class="toolbar">
                 <h2>Available Courses</h2>
-
-                <button id="refresh-button" class="secondary-button" type="button">
-                    Refresh
-                </button>
+                <button id="refresh-button" class="secondary-button" type="button">Refresh</button>
             </div>
 
             <table>
@@ -233,6 +264,7 @@
                         <th>ID</th>
                         <th>Course Name</th>
                         <th>Credits</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 

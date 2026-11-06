@@ -8,10 +8,7 @@ app.use(express.static("public"));
 
 function parseCourseId(rawId) {
   const id = Number(rawId);
-
-  return Number.isSafeInteger(id) && id > 0
-    ? id
-    : null;
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
 function validateCourse(data) {
@@ -28,63 +25,40 @@ function validateCourse(data) {
 app.get("/api/courses", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, name, credits
-       FROM courses
-       ORDER BY id`
+      `SELECT id, name, credits FROM courses ORDER BY id`
     );
-
     res.status(200).json(result.rows);
   } catch (error) {
     console.error(error);
-
-    res.status(500).json({
-      error: "Unable to retrieve courses"
-    });
+    res.status(500).json({ error: "Unable to retrieve courses" });
   }
 });
 
 app.get("/api/courses/:id", async (req, res) => {
   const id = parseCourseId(req.params.id);
-
   if (id === null) {
-    return res.status(400).json({
-      error: "Invalid course ID"
-    });
+    return res.status(400).json({ error: "Invalid course ID" });
   }
-
   try {
     const result = await pool.query(
-      `SELECT id, name, credits
-       FROM courses
-       WHERE id = $1`,
+      `SELECT id, name, credits FROM courses WHERE id = $1`,
       [id]
     );
-
     if (result.rows.length === 0) {
-      return res.status(404).json({
-        error: "Course not found"
-      });
+      return res.status(404).json({ error: "Course not found" });
     }
-
     res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error(error);
-
-    res.status(500).json({
-      error: "Unable to retrieve course"
-    });
+    res.status(500).json({ error: "Unable to retrieve course" });
   }
 });
 
 app.post("/api/courses", async (req, res) => {
   if (!validateCourse(req.body)) {
-    return res.status(400).json({
-      error: "Invalid course data"
-    });
+    return res.status(400).json({ error: "Invalid course data" });
   }
-
   const { name, credits } = req.body;
-
   try {
     const result = await pool.query(
       `INSERT INTO courses (name, credits)
@@ -92,19 +66,74 @@ app.post("/api/courses", async (req, res) => {
        RETURNING id, name, credits`,
       [name.trim(), credits]
     );
-
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: "Unable to create course" });
+  }
+});
 
-    res.status(500).json({
-      error: "Unable to create course"
+app.put("/api/courses/:id", async (req, res) => {
+  const id = parseCourseId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: "Invalid course ID" });
+  }
+
+  if (!validateCourse(req.body)) {
+    return res.status(400).json({ error: "Invalid course data" });
+  }
+
+  const { name, credits } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE courses
+       SET name = $1, credits = $2
+       WHERE id = $3
+       RETURNING id, name, credits`,
+      [name.trim(), credits, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Unable to update course" });
+  }
+});
+
+app.delete("/api/courses/:id", async (req, res) => {
+  const id = parseCourseId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: "Invalid course ID" });
+  }
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM courses
+       WHERE id = $1
+       RETURNING id, name, credits`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    res.status(200).json({
+      message: "Course deleted successfully",
+      course: result.rows[0],
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Unable to delete course" });
   }
 });
 
 const port = Number(process.env.PORT || 3000);
-
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
