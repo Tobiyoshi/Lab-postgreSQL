@@ -50,7 +50,7 @@ function renderCourses(courses) {
     const creditsCell = document.createElement("td");
     creditsCell.textContent = course.credits;
 
-    // Actions cell (Edit, Delete, and Rainbow button at the end)
+    // Actions cell (Edit and Delete)
     const actionsCell = document.createElement("td");
     actionsCell.className = "actions-cell";
 
@@ -66,15 +66,7 @@ function renderCourses(courses) {
     deleteBtn.textContent = "Delete";
     deleteBtn.addEventListener("click", () => handleDelete(course.id, course.name));
 
-    const rainbowBtn = document.createElement("button");
-    rainbowBtn.type = "button";
-    rainbowBtn.className = "rainbow-button";
-    rainbowBtn.textContent = "🌈 Rainbow";
-    rainbowBtn.addEventListener("click", () => {
-      showStatus(`✨ คุณคลิกปุ่มสีรุ้งของวิชา: ${course.name}`, "success");
-    });
-
-    actionsCell.append(editBtn, deleteBtn, rainbowBtn);
+    actionsCell.append(editBtn, deleteBtn);
     row.append(idCell, nameCell, creditsCell, actionsCell);
     courseList.appendChild(row);
   }
